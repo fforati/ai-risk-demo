@@ -1,0 +1,30 @@
+name: ai-risk-demo
+
+on:
+  push:
+
+jobs:
+
+  analyze:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Run Pluto
+        run: |
+          pluto detect-files -d manifests/
+
+      - name: Run AI Analyzer
+        env:
+          OPENAI_API_KEY: OPENAI_API_KEY: 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
+        run: |
+          pip install openai
+          python risk-engine/analyze.py
+
+      - name: Run Tests
+        run: |
+          pip install pytest kubernetes
+          pytest tests/
