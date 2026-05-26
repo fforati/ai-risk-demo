@@ -16,7 +16,7 @@ jobs:
 
       - name: Run Pluto
         run: |
-          pluto detect-files -d manifests/
+          pluto detect-files -d manifest/
 
       - name: Run AI Analyzer
         env:
