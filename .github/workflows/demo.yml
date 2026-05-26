@@ -1,6 +1,7 @@
 name: ai-risk-demo
 
 on:
+  workflow_dispatch:
   push:
 
 jobs:
