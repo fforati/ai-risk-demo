@@ -13,14 +13,6 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
-
-       - name: Run Pluto (Docker)
-          run: |
-            docker run --rm \
-              -v ${{ github.workspace }}:/data \
-                quay.io/fairwinds/pluto:latest \
-                detect-files -d /data/manifest
-
       - name: Run AI Analyzer
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
