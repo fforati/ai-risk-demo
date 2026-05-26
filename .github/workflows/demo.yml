@@ -13,6 +13,12 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
+      - name: Install Pluto
+        run: |
+          curl -L https://github.com/FairwindsOps/pluto/releases/latest/download/pluto_linux_amd64.tar.gz -o pluto.tar.gz
+          tar -xzf pluto.tar.gz
+          chmod +x pluto
+          sudo mv pluto /usr/local/bin/
 
       - name: Run Pluto
         run: |
