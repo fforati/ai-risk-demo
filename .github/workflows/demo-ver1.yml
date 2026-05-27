@@ -1,0 +1,27 @@
+name: ai-risk-demo
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+
+  analyze:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+      - name: Run AI Analyzer
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+        run: |
+          pip install openai
+          python risk-engine/analyze.py
+
+      - name: Run Tests
+        run: |
+          pip install pytest kubernetes
+          pytest tests/

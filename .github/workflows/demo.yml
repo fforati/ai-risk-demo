@@ -1,27 +1,93 @@
-name: ai-risk-demo
+name: ai-risk-demo-upgrade
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
 
-  analyze:
+  upgrade-test:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - uses: actions/checkout@v4
-      - name: Run AI Analyzer
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      # -----------------------------
+      # Install kind
+      # -----------------------------
+      - name: Install Kind
         run: |
-          pip install openai
-          python risk-engine/analyze.py
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
 
-      - name: Run Tests
+      # -----------------------------
+      # Install kubectl
+      # -----------------------------
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      # -----------------------------
+      # Create ephemeral cluster
+      # -----------------------------
+      - name: Create cluster
+        run: |
+          kind create cluster --name ai-demo
+
+      # -----------------------------
+      # Verify cluster
+      # -----------------------------
+      - name: Cluster health
+        run: |
+          kubectl get nodes
+
+      # -----------------------------
+      # Simulate deprecated detection
+      # -----------------------------
+      - name: Detect deprecated API
+        run: |
+          echo "Detected deprecated ingress API"
+
+      # -----------------------------
+      # Apply upgraded manifest
+      # -----------------------------
+      - name: Apply upgraded manifest
+        run: |
+          kubectl apply -f manifests/ingress-new.yaml
+
+      # -----------------------------
+      # Verify resources
+      # -----------------------------
+      - name: Verify ingress
+        run: |
+          kubectl get ingress
+
+      # -----------------------------
+      # Setup Python
+      # -----------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # -----------------------------
+      # Install dependencies
+      # -----------------------------
+      - name: Install Python deps
         run: |
           pip install pytest kubernetes
+
+      # -----------------------------
+      # Run final tests
+      # -----------------------------
+      - name: Final validation tests
+        run: |
           pytest tests/
+
+
+
